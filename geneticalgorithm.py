@@ -7,9 +7,18 @@ Created on Sat Jan 11 20:32:03 2020
 
 import numpy as np
 
-def fitness_calculator(cost_function, parameters):
+def cost_function(x,y):
+    result = ((y*np.sin(x+y))+(x*np.cos(y)))/(20+np.power(x,2))
+    return result
+
+def fitness_calculator(population):
     # calulates the result of a linear problem (for now...)
-    fitness_values = np.sum(parameters*cost_function, axis=1)
+    #fitness_values = np.sum(parameters*cost_function, axis=1)
+    fitness_values = np.zeros(population.shape[0])
+    for i in range (population.shape[0]):
+        x=population[i,0]
+        y=population[i,1]
+        fitness_values[i] = cost_function(x,y)
     return fitness_values
 
 def select_parents(population, fitness_values, number_of_parents):
@@ -43,11 +52,13 @@ def crossover_mating(parents, number_of_offsprings):
         offsprings[index, crossover_at:] = parents[second_parent, crossover_at:]
     return offsprings
 
-def mutate(offsprings):
+def mutate(offsprings,parameters_range):
     #mutating a random parameter in each offspring:
     for index in range(offsprings.shape[0]):
-        mutation_size = np.random.uniform(-1.0,1.0,1)
+        mutation_range = np.random.uniform(-1.0,1.0,1)
+        mutation_magnitude = 1.0
         random_gene = np.random.randint(0,offsprings.shape[1],1)
+        mutation_size = mutation_range*mutation_magnitude*np.min([offsprings[index,random_gene]-parameters_range[0,random_gene],parameters_range[1,random_gene]-offsprings[index,random_gene]])
         offsprings[index,random_gene] = offsprings[index,random_gene] + mutation_size
     return offsprings
 
